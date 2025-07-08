@@ -2,113 +2,53 @@
 let time = 0;
 
 function setup() {
-    // Create fullscreen canvas
-    createCanvas(windowWidth, windowHeight);
-    
-    // Set angle mode to degrees
-    angleMode(DEGREES);
-    
-    // Set color mode to HSB (Hue, Saturation, Brightness)
-    colorMode(HSB, 360, 100, 100, 100);
+  // Create fullscreen canvas
+  createCanvas(windowWidth, windowHeight);
+
+  // Set color mode to HSB for easier color manipulation
+  colorMode(HSB, 360, 100, 100);
 }
 
 function draw() {
-    // Set background to black
-    background(0, 0, 0);
-    
-    // Move origin to center
-    translate(width / 2, height / 2);
-    
-    // Increment time
-    time += 0.8;
-    
-    // Draw spiral flower
-    drawSpiralFlower();
-}
+  // Black background
+  background(0);
 
-function drawSpiralFlower() {
-    // Set number of petals and layers
-    const petals = 8;
-    const layers = 6;
-    
-    // Draw each layer
-    for (let layer = 0; layer < layers; layer++) {
-        // Calculate different hue for each layer
-        let hue = (time * 0.5 + layer * 60) % 360;
-        
-        // Decrease alpha for outer layers
-        let alpha = 90 - layer * 12;
-        
-        // Set stroke color and weight - scale stroke to screen
-        stroke(hue, 80, 95, alpha);
-        strokeWeight((2.5 - layer * 0.3) * (min(width, height) / 600));
-        noFill();
-        
-        // Draw petal shape
-        beginShape();
-        for (let i = 0; i < 361; i++) {
-            // Different rotation speed for each layer
-            let angle = i + time * (layer + 1) * 0.4;
-            
-            // Calculate petal radius using sin function
-            let petalRadius = sin(petals * angle);
-            
-            // Add wave effect
-            let waveEffect = cos(angle * 0.08 + time * 0.3);
-            
-            // Calculate final radius - scale to screen size
-            let baseRadius = min(width, height) * 0.4;
-            let r = (baseRadius - layer * (baseRadius * 0.1)) * petalRadius * waveEffect;
-            
-            // Convert polar to cartesian coordinates
-            let x = r * cos(angle);
-            let y = r * sin(angle);
-            
-            // Add vertex
-            vertex(x, y);
-        }
-        endShape();
-    }
-    
-    // Add small glowing center point
-    drawCenterGlow();
-}
+  // Move origin to center of screen
+  translate(width / 2, height / 2);
 
-function drawCenterGlow() {
-    // Draw center glow effect
+  // Very slow time increment for peaceful animation
+  time += 0.005;
+
+  // 80-fold symmetry kaleidoscope (like pages of a book)
+  for (let symmetry = 0; symmetry < 80; symmetry++) {
     push();
-    
-    // Rotate based on time
-    rotate(time * 2);
-    
-    // Change glow color over time
-    let glowHue = (time * 1.5) % 360;
-    
-    // Create glow effect with multiple concentric circles - scale to screen
-    for (let i = 0; i < 5; i++) {
-        let baseSize = min(width, height) * 0.02;
-        let radius = baseSize + i * (baseSize * 0.5);
-        let alpha = 100 - i * 20;
-        
-        stroke(glowHue, 60, 100, alpha);
-        strokeWeight((2 - i * 0.3) * (min(width, height) / 600));
-        noFill();
-        
-        // Draw slightly deformed circles - scale to screen
-        beginShape();
-        for (let angle = 0; angle < 360; angle += 10) {
-            let r = radius + sin(angle * 3 + time) * (baseSize * 0.3);
-            let x = r * cos(angle);
-            let y = r * sin(angle);
-            vertex(x, y);
-        }
-        endShape(CLOSE);
-    }
-    
+
+    // Rotate each "page" by 4.5 degrees (360÷80=4.5)
+    rotate(symmetry * 4.5);
+
+    // Each ball has slightly different speed for organic movement
+    let speedMultiplier = 1 + symmetry * 0.02;
+
+    // Spiral motion with breathing effect - full screen coverage
+    let maxRadius = min(width, height) * 0.45; // Use 45% of screen size
+    let radius =
+      maxRadius * (0.3 + 0.7 * (sin(time * 0.3 * speedMultiplier) * 0.5 + 0.5));
+    let x = cos(time * 2 * speedMultiplier) * radius;
+    let y = sin(time * 2 * speedMultiplier) * radius;
+
+    // Color changes smoothly across the spectrum
+    let hue = (time * 2 + symmetry * 4.5) % 360;
+
+    // Draw the ball
+    fill(hue, 80, 90);
+    noStroke();
+    circle(x, y, 15);
+
     pop();
+  }
 }
 
-// Handle window resize
+// Handle window resize for responsive design
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
 }

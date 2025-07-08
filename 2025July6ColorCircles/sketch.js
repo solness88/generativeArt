@@ -1,99 +1,116 @@
 // Global variables
 let time = 0;
+let noiseScale = 0.01; // ノイズのスケール
 
 function setup() {
-  // Create fullscreen canvas
   createCanvas(windowWidth, windowHeight);
-
-  // Set angle mode to degrees
   angleMode(DEGREES);
-
-  // Set color mode to HSB (Hue, Saturation, Brightness)
   colorMode(HSB, 360, 100, 100, 100);
 }
 
 function draw() {
-  // Very dark background to prevent blackout gaps
   background(220, 20, 15);
-
-  // Move origin to center
   translate(width / 2, height / 2);
-
-  // Moderate speed - not too fast, not too slow
   time += 0.55;
-
-  // Draw geometric grid patterns
   drawGeometricGrid();
 }
 
 function drawGeometricGrid() {
-  // Grid-based geometric patterns
   let maxSize = min(width, height) * 0.8;
   let gridSize = 12;
   let cellSize = maxSize / gridSize;
 
-  // Create grid of geometric shapes
   for (let x = -gridSize / 2; x < gridSize / 2; x++) {
     for (let y = -gridSize / 2; y < gridSize / 2; y++) {
       let posX = x * cellSize;
       let posY = y * cellSize;
 
-      // Distance from center for scaling effect
       let distance = sqrt(x * x + y * y);
-      let maxDistance = sqrt(
-        (gridSize / 2) * (gridSize / 2) + (gridSize / 2) * (gridSize / 2)
+
+      // 方法1: ペルリンノイズを使用した自然な不規則性
+      let noiseValue = noise(
+        (x + gridSize / 2) * noiseScale,
+        (y + gridSize / 2) * noiseScale,
+        time * 0.01
       );
-      let distanceRatio = distance / maxDistance;
+      let noiseOffset = noiseValue * 100;
 
-      // Time-based animation with moderate speed
-      let timeOffset = distance * 0.5;
-      let scaleAmount = 0.3 + 0.7 * abs(sin(time * 0.55 + timeOffset)); // Moderate speed
-      let rotation = time * 0.7 + distance * 15; // Moderate rotation speed
+      // 方法2: 複数の異なる周期の組み合わせ
+      let slowWave = sin(time * 0.3 + distance * 5);
+      let mediumWave = sin(time * 0.8 + x * 25 + y * 15);
+      let fastWave = sin(time * 1.5 + (x * x + y * y) * 3);
 
-      // Slightly muted colors with moderate cycling
-      let hue = (time * 1.1 + distance * 60) % 360; // Moderate color cycling
-      let saturation = 75 + sin(time * 0.55 + distance * 2) * 10; // Reduced saturation (75-85)
-      let brightness = 80 + sin(time * 0.45 + distance * 2.5) * 10; // Reduced brightness (70-90)
-      let alpha = 75 + 15 * abs(sin(time * 0.6 + distance * 1.5)); // Moderate alpha changes
+      // 方法3: フィボナッチ数列ベースの周期
+      let fibIndex = (abs(x) + abs(y)) % 8;
+      let fibNumbers = [1, 1, 2, 3, 5, 8, 13, 21];
+      let fibScale = fibNumbers[fibIndex] * 0.1;
+      let fibWave = sin(time * fibScale + distance * 10);
+
+      // 方法4: 素数ベースの不規則性
+      let primes = [2, 3, 5, 7, 11, 13, 17, 19];
+      let primeIndex = abs(x * 2 + y * 3) % primes.length;
+      let primeWave = cos(time * 0.1 * primes[primeIndex] + distance * 8);
+
+      // すべての波を組み合わせ
+      let combinedWave =
+        (slowWave +
+          mediumWave * 0.7 +
+          fastWave * 0.5 +
+          fibWave * 0.8 +
+          primeWave * 0.6 +
+          (noiseValue - 0.5) * 4) /
+        4.0;
+
+      // スケールの計算（より劇的な変化）
+      let scaleAmount = 0.1 + 0.9 * (0.5 + 0.5 * combinedWave);
+
+      // 時々完全に消える効果
+      if (abs(combinedWave) < 0.1) {
+        scaleAmount *= 0.1; // ほぼ消える
+      }
+
+      // 回転も不規則に
+      let rotation =
+        time * (0.5 + noiseValue) +
+        distance * 15 +
+        x * 20 +
+        y * 25 +
+        combinedWave * 45;
+
+      // 色も複雑に変化
+      let hue =
+        (time * 0.8 +
+          distance * 40 +
+          combinedWave * 60 +
+          x * 12 +
+          y * 18 +
+          noiseOffset) %
+        360;
+
+      let saturation = 100; // 最大彩度
+      let brightness = 100; // 最大明度
+      let alpha = 60 + 30 * abs(combinedWave);
 
       stroke(hue, saturation, brightness, alpha);
-      strokeWeight(2 * (min(width, height) / 800)); // Reduced from 3 to 2 (2/3 of original)
+
+      // 線の太さも変化
+      let weight = (1 + abs(combinedWave)) * 2 * (min(width, height) / 800);
+      strokeWeight(weight);
       noFill();
 
       push();
       translate(posX, posY);
       rotate(rotation);
-      scale(scaleAmount, scaleAmount);
+      scale(scaleAmount);
 
-      // Alternate between different geometric shapes - all circles now
-      let shapeType = (abs(x) + abs(y)) % 1; // Only one type: circle
-
-      switch (shapeType) {
-        case 0:
-        default:
-          // Circle
-          circle(0, 0, cellSize / 2);
-          break;
-      }
+      // 常に円を描画
+      circle(0, 0, cellSize / 2);
 
       pop();
     }
   }
-
-  // Remove connection lines and geometric center
-  // drawConnectionLines();
-  // drawGeometricCenter();
 }
 
-// Removed unused shape functions
-// function drawTriangle(size) { ... }
-// function drawDiamond(size) { ... }
-// function drawHexagon(size) { ... }
-// function drawConnectionLines() { ... }
-// function drawGeometricCenter() { ... }
-// function drawStar(radius, points) { ... }
-
-// Handle window resize
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
