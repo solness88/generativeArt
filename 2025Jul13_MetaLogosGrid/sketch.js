@@ -1,5 +1,5 @@
 let objects = [];
-const radius = 35;
+const radius = 40;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -43,13 +43,13 @@ function draw() {
     let circleX = radius * cos(obj.angleX);
     let circleY = radius * sin(obj.angleY);
     fill(obj.color1);
-    ellipse(circleX, circleY, 8, 8);
+    ellipse(circleX, circleY, 20, 20);
     
     // 2つ目の円
     let circleX2 = radius * cos(obj.angleX2);
     let circleY2 = radius * sin(obj.angleY2);
     fill(obj.color2);
-    ellipse(circleX2, circleY2, 8, 8);
+    ellipse(circleX2, circleY2, 20, 20);
     
     obj.angleX += 1;
     obj.angleY += 2;
