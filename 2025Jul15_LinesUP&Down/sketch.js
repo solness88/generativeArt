@@ -1,5 +1,5 @@
 let startPointY;
-let lineLength = 1000; // 線の長さ
+let lineLength = 800; // 線の長さ
 let endPointY = startPointY + lineLength;
 let speed = 1;
 let pointX = -600;
@@ -23,7 +23,7 @@ function setup() {
 
 function draw() {
   translate(width/2, 0)
-  background(0, 10); // 軌跡を残すため少し透明な黒
+  background(0, 5); // 軌跡を残すため少し透明な黒
   strokeWeight(3)
 
   for(let j = 0; j < 120; j++){
