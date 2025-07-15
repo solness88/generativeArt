@@ -70,12 +70,7 @@ function draw() {
       // 波の値を0〜1の範囲にマップ
       let sizeMultiplier = map(wave, -1, 1, 0.3, 1.0);
       let newSize = circleDiameter * sizeMultiplier;
-      
-      // // 円が小さくなる分、位置を中心に向かって調整
-      // let sizeReduction = circleDiameter - newSize;
-      // let adjustedX = circleCenterX;
-      // let adjustedY = circleCenterY;
-      
+            
       fill(circleColors[j][i]);
       ellipse(circleCenterX, circleCenterY, newSize, newSize);
     }
