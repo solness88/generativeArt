@@ -23,11 +23,19 @@ function setup() {
 
 function draw() {
   translate(width/2, 0)
-  background(0, 5); // 軌跡を残すため少し透明な黒
+  background(0, 50); // 軌跡を残すため少し透明な黒
   strokeWeight(3)
 
   for(let j = 0; j < 120; j++){
     stroke(lineColors[j])
+
+    // 線の位置によって透明度を計算（上にあるほど薄く）
+    let alpha = map(linePositions[j].startPointY, -1800, height, 0, 255);
+    alpha = constrain(alpha, 0, 255); // 50-255の範囲に制限
+  
+    // 色に透明度を適用
+    let c = color(red(lineColors[j]), green(lineColors[j]), blue(lineColors[j]), alpha);
+    stroke(c);
 
     linePositions[j].startPointY += lineSpeed[j];
     linePositions[j].endPointY += lineSpeed[j];
