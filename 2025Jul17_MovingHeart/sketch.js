@@ -77,6 +77,3 @@ function drawOneHeart(x, y) {
 
 }
 
-function windowResized() {
-  resizeCanvas(600, 400);
-}
